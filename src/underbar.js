@@ -7,6 +7,7 @@
   // seem very useful, but remember it--if a function needs to provide an
   // iterator when the user does not pass one in, this will be handy.
   _.identity = function(val) {
+    return val;
   };
 
   /**
@@ -37,6 +38,7 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+    return n === undefined ? array[array.length - 1] : array.slice(Math.max(0, array.length - n));
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -45,6 +47,15 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    if(Array.isArray(collection)) {
+      for (let i = 0; i < collection.length; i++) {
+        iterator(collection[i], i, collection);
+      }
+    } else {
+      for (let key in collection) {
+        iterator(collection[key], key, collection);
+      }
+    } 
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -66,16 +77,33 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    let results = [];
+    _.each(collection, (value, key, currentCollection) => {
+      if(test(value)) {
+        results.push(value);
+      }
+    });
+    return results;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    return _.filter(collection, (value) => {
+      return  !test(value);
+    });
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+    let results = [];
+    _.each(array, (val, key, collection) => {
+      if (results.indexOf(val) === -1) {
+        results.push(val);
+      }
+    });
+    return results;
   };
 
 
@@ -84,6 +112,11 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    let results = [];
+    _.each(collection, function(val) {
+      results.push(iterator(val));
+    });
+    return results;
   };
 
   /*
@@ -125,6 +158,18 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    let initialValue = accumulator;
+    let initial = initialValue === undefined;
+    _.each(collection, (currentVal, idx, obj) => {
+        if(initial){
+          initial = false;
+          initialValue = currentVal;
+        } else {
+          initialValue = iterator(initialValue, currentVal, idx, obj);
+        }
+    });
+    return initialValue;
+
   };
 
   // Determine if the array or object contains a given value (using `===`).
