@@ -83,6 +83,7 @@
         results.push(value);
       }
     });
+    //console.log(results);
     return results;
   };
 
@@ -354,11 +355,11 @@
       });
     } else {
       _.each(collection, (value) => { 
-        
+        let strObj = value;
+        results.push(strObj[functionOrKey]());
       });
     }
-    console.log(results);
-      return results;
+    return results;
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -366,6 +367,7 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -374,6 +376,13 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    let arr = Array.prototype.slice.call(arguments);
+    let zipArray = arr[0].map(function(col,i){
+      return arr.map(function(row){
+          return row[i];
+      });
+    });
+    return zipArray;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -381,16 +390,39 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    let results = Array.isArray(result) ? result : [];
+    _.each(nestedArray, (value) => { 
+        if(Array.isArray(value)){
+          _.flatten(value, results);
+        } else {
+          results.push(value);
+        }
+    });
+    return results;
+    
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    let arr = Array.prototype.slice.call(arguments);
+    return _.filter(arr[0], value => {
+        return arr[1].indexOf(value) !== -1;
+    });
+
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    let arr = Array.prototype.slice.call(arguments,1);
+    _.each(arr, currentArr => {
+      return _.filter(array, value => {
+        //console.log(value);
+        return currentArr.indexOf(value) === -1;
+      });
+    });
+    
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
