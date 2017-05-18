@@ -416,13 +416,18 @@
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
     let arr = Array.prototype.slice.call(arguments,1);
+    let merged = []; let results = [];
     _.each(arr, currentArr => {
-      return _.filter(array, value => {
-        //console.log(value);
-        return currentArr.indexOf(value) === -1;
+      _.each(currentArr, value => {
+          merged.push(value);
       });
     });
-    
+   _.each(array, value => {
+      if( merged.indexOf(value) === -1 ) {
+        results.push(value);
+      };
+    });
+    return results;
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
@@ -431,5 +436,21 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+      const args = Array.from(arguments).slice(2);
+      var last, deferTimer;
+      return function(){
+        var now = +new Date;
+        if (last && now < last + wait) {
+          // hold on to it
+          clearTimeout(deferTimer);
+          deferTimer = setTimeout(function () {
+            last = now;
+            func.apply(this, args);
+          }, wait);
+        } else {
+          last = now;
+          func.apply(this, args);
+        }
+      };
   };
 }());
